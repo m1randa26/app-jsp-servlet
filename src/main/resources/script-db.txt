@@ -1,0 +1,84 @@
+CREATE DATABASE sistema_generaciones;
+USE sistema_generaciones;
+
+-- Tabla de generaciones
+CREATE TABLE generaciones (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    activa BOOLEAN DEFAULT TRUE
+);
+
+-- Tabla de carreras
+CREATE TABLE carreras (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    activa BOOLEAN DEFAULT TRUE
+);
+
+-- Tabla de especialidades
+CREATE TABLE especialidades (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    activa BOOLEAN DEFAULT TRUE
+);
+
+-- Tabla intermedia: generacion_carrera (muchos a muchos)
+CREATE TABLE generacion_carrera (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    generacion_id INT NOT NULL,
+    carrera_id INT NOT NULL,
+    FOREIGN KEY (generacion_id) REFERENCES generaciones(id) ON DELETE CASCADE,
+    FOREIGN KEY (carrera_id) REFERENCES carreras(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_gen_carrera (generacion_id, carrera_id)
+);
+
+-- Tabla intermedia: carrera_especialidad (muchos a muchos)
+CREATE TABLE carrera_especialidad (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    carrera_id INT NOT NULL,
+    especialidad_id INT NOT NULL,
+    FOREIGN KEY (carrera_id) REFERENCES carreras(id) ON DELETE CASCADE,
+    FOREIGN KEY (especialidad_id) REFERENCES especialidades(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_carrera_esp (carrera_id, especialidad_id)
+);
+
+-- Insertar datos de ejemplo
+INSERT INTO generaciones (nombre, fecha_inicio, fecha_fin) VALUES
+('Gen 2025 - Enero/2026', '2025-01-01', '2026-01-01'),
+('Gen 2024 - Julio/2025', '2024-07-01', '2025-07-01'),
+('Gen 2024 - Enero/2025', '2024-01-01', '2025-01-01');
+
+INSERT INTO carreras (nombre, descripcion) VALUES
+('Ingeniería Civil', 'Carrera de ingeniería civil y construcción'),
+('Ingeniería en Sistemas', 'Carrera de sistemas computacionales'),
+('Ingeniería Industrial', 'Carrera de optimización de procesos'),
+('Licenciatura en Contaduría', 'Carrera de contabilidad y finanzas');
+
+INSERT INTO especialidades (nombre, descripcion) VALUES
+('Estructuras', 'Especialidad en diseño estructural'),
+('Construcción', 'Especialidad en construcción y obra'),
+('Hidráulica', 'Especialidad en sistemas hidráulicos'),
+('Desarrollo Web', 'Especialidad en desarrollo web'),
+('Bases de Datos', 'Especialidad en administración de BD'),
+('Redes', 'Especialidad en redes y telecomunicaciones'),
+('Producción', 'Especialidad en procesos productivos'),
+('Calidad', 'Especialidad en control de calidad'),
+('Auditoría', 'Especialidad en auditoría contable'),
+('Fiscal', 'Especialidad en aspectos fiscales');
+
+-- Relacionar generaciones con carreras
+INSERT INTO generacion_carrera (generacion_id, carrera_id) VALUES
+(1, 1), (1, 2), (1, 3), (1, 4),  -- Gen 2025 tiene todas las carreras
+(2, 1), (2, 2), (2, 4),          -- Gen 2024-Julio tiene 3 carreras
+(3, 2), (3, 3);                  -- Gen 2024-Enero tiene 2 carreras
+
+-- Relacionar carreras con especialidades
+INSERT INTO carrera_especialidad (carrera_id, especialidad_id) VALUES
+(1, 1), (1, 2), (1, 3),          -- Ing. Civil: Estructuras, Construcción, Hidráulica
+(2, 4), (2, 5), (2, 6),          -- Ing. Sistemas: Web, BD, Redes
+(3, 7), (3, 8),                  -- Ing. Industrial: Producción, Calidad
+(4, 9), (4, 10);
